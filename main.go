@@ -232,11 +232,10 @@ func DisplayStatus(tracker OrderTracker, spinnerString string) OrderStatus {
 	return OrderOngoing
 }
 
-func updateTracker(tracker *OrderTracker, latestOrder int64, customerId string, ch chan int) {
+func updateTracker(tracker *OrderTracker, latestOrder int64, customerId string) {
 	for {
 		trackerEx, _ := TrackOrder(latestOrder, customerId)
 		*tracker = trackerEx
-		ch <- 1
 		time.Sleep(time.Second * 2)
 	}
 }
@@ -249,11 +248,8 @@ func main() {
 	customerId := orders.Data.Orders[0].CustomerId
 
 	var tracker OrderTracker
-	ch := make(chan int)
 
-	go updateTracker(&tracker, latestOrder, customerId, ch)
-	// Only start displaying stuff only after the first API response
-	<-ch
+	go updateTracker(&tracker, latestOrder, customerId)
 
 	index := 0
 	for {
