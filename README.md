@@ -7,7 +7,15 @@ It checks the status of the last order you placed, and if it's an ongoing order 
 
 ## Installation
 
-Currently, no pre-build binaries are given. To try this out, you could clone the repo and build the binary yourself
+### Pre-Built Binaries
+
+Pre-built binaries are available for most operating systems and architectures are available in the latest release. 
+To use them, simply download the binary and run. To make the program available from every directory, make sure to move
+the binary to a location that is in the PATH.
+
+### From Source
+
+you could clone the repo and build the binary yourself
 
 ```bash
 git clone https://github.com/Roshan-R/swiggy-cli
