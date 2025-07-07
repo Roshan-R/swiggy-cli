@@ -150,6 +150,12 @@ func TrackOrder(orderId int64, customerId string) (OrderTracker, error) {
 	return orderTracker, nil
 }
 
+func Exit(r int) {
+	// Unhide cursor on program exit
+	fmt.Printf("\x1b[?25h")
+	os.Exit(r)
+}
+
 func Init() {
 
 	// Handler to use, to show the cursor
@@ -157,8 +163,7 @@ func Init() {
 	signal.Notify(c, os.Interrupt)
 	go func() {
 		for range c {
-			fmt.Printf("\x1b[?25h")
-			os.Exit(0)
+			Exit(0)
 		}
 	}()
 
@@ -188,7 +193,7 @@ func DisplayStatus(tracker OrderTracker, spinnerString string) OrderStatus {
 	title := tracker.Data.TrackCrouton.Title
 	if title == "Order Delivered" {
 		fmt.Println("Cannot find any active orders to track")
-		os.Exit(0)
+		Exit(0)
 	}
 
 	//if tracker.Data.TrackCrouton.Title == "Out for delivery" {
