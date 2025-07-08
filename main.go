@@ -76,10 +76,22 @@ func ReadCookie() (string, error) {
 
 func RefreshCookie(new bool) string {
 	if new {
-		fmt.Println("Go to the browser and fetch the swiggy cookies here: ")
+		newMessage := `
+swiggy-cli cannot get a valid cookie file. Complete the steps below
+to get your cookie and paste it here once you get it.
+
+1. Go to https://swiggy.com and login
+2. After logging in, open up your web developer tools in your browser, and refresh your page
+3. From there, select the first request that goes to swiggy.com
+4. Click on it, and in the headers tab, scroll down to Request Headers and look for the "Cookie" header
+5. Right click on "Cookie" and click on "Copy Value"
+
+Once you get the cookie, paste the value here: `
+		fmt.Print(newMessage)
 	} else {
 		fmt.Println("The given cookie has expired. Paste a new one here: ")
 	}
+	UnhideCursor()
 	reader := bufio.NewReader(os.Stdin)
 	cookie, err := reader.ReadString('\n')
 	if err != nil {
@@ -89,6 +101,7 @@ func RefreshCookie(new bool) string {
 	if err != nil {
 		fmt.Println("Can't save cookie to the path :" + cookieFile)
 	}
+	HideCursor()
 	return cookie
 }
 
@@ -150,9 +163,17 @@ func TrackOrder(orderId int64, customerId string) (OrderTracker, error) {
 	return orderTracker, nil
 }
 
+func UnhideCursor() {
+	fmt.Printf("\x1b[?25h")
+}
+
+func HideCursor() {
+	fmt.Printf("\x1b[?25l")
+}
+
 func Exit(r int) {
 	// Unhide cursor on program exit
-	fmt.Printf("\x1b[?25h")
+	UnhideCursor()
 	os.Exit(r)
 }
 
@@ -167,8 +188,7 @@ func Init() {
 		}
 	}()
 
-	// hide the cursor
-	fmt.Printf("\x1b[?25l")
+	HideCursor()
 	configPath := configdir.LocalConfig("swiggy-cli")
 	err := configdir.MakePath(configPath) // Ensure it exists.
 	if err != nil {
