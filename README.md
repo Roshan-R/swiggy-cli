@@ -5,6 +5,8 @@
 swiggy-cli is a cli application to track your swiggy order. It makes use of user provided browser cookies and calls the SwiggyAPIs to fetch and show data.
 It checks the status of the last order you placed, and if it's an ongoing order a simple downloader-like progress bar shows up with real time updates.
 
+The browser cookie is stored as a plain text file to ~/.config/swiggy-cli/cookie
+
 ## Installation
 
 ### Pre-Built Binaries
