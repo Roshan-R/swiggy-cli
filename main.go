@@ -151,7 +151,6 @@ func GetOrders() (Orders, error) {
 
 func TrackOrder(orderId int64, customerId string) (OrderTracker, error) {
 	url := "https://www.swiggy.com/dapi/order/trackV4?order_id=" + strconv.FormatInt(orderId, 10) + "&type=full&version=V2&customer_id=" + customerId
-
 	res, _ := GetReq(url)
 	body, _ := io.ReadAll(res.Body)
 
@@ -188,7 +187,6 @@ func Init() {
 		}
 	}()
 
-	HideCursor()
 	configPath := configdir.LocalConfig("swiggy-cli")
 	err := configdir.MakePath(configPath) // Ensure it exists.
 	if err != nil {
@@ -212,11 +210,10 @@ const (
 func DisplayStatus(tracker OrderTracker, spinnerString string) OrderStatus {
 	title := tracker.Data.TrackCrouton.Title
 	if title == "Order Delivered" {
-		fmt.Println("Cannot find any active orders to track")
+		fmt.Println("Order delivered successfully!")
 		Exit(0)
 	}
 
-	//if tracker.Data.TrackCrouton.Title == "Out for delivery" {
 	width, _, err := term.GetSize(0)
 	if err != nil {
 		panic(err)
@@ -268,14 +265,25 @@ func updateTracker(tracker *OrderTracker, latestOrder int64, customerId string) 
 func main() {
 	Init()
 
+	fmt.Println("Fetching latest order")
+
 	orders, _ := GetOrders()
 	latestOrder := orders.Data.Orders[0].OrderID
 	customerId := orders.Data.Orders[0].CustomerId
 
 	var tracker OrderTracker
 
+	// Abort program if no active order is found
+	tracker, _ = TrackOrder(latestOrder, customerId)
+	if tracker.Data.TrackCrouton.Title == "Order Delivered" {
+		fmt.Println("Looks like the latest order has completed the delivery")
+		fmt.Println("Could not find any active orders")
+		Exit(1)
+	}
+
 	go updateTracker(&tracker, latestOrder, customerId)
 
+	HideCursor()
 	index := 0
 	for {
 		progressStates := []string{"⣷", "⣯", "⣟", "⡿", "⢿", "⣻", "⣽", "⣾"}
